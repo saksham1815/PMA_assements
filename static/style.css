@@ -1,0 +1,45 @@
+body {
+    font-family: sans-serif;
+    background: #eef;
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .container {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    max-width: 600px;
+    margin: auto;
+  }
+  
+  input {
+    padding: 8px;
+    width: 60%;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+  }
+  
+  button {
+    padding: 8px 12px;
+    margin: 10px;
+    border: none;
+    border-radius: 8px;
+    background: #007BFF;
+    color: white;
+    cursor: pointer;
+  }
+  
+  .forecast {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  
+  .forecast-card {
+    background: #def;
+    padding: 10px;
+    border-radius: 10px;
+  }
+  

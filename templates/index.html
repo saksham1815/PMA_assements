@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Weather App - Saksham Saxena</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>🌦️ Weather App</h1>
+      <p>
+        by Saksham Saxena |
+        <a
+          href="https://www.linkedin.com/company/product-manager-accelerator"
+          target="_blank"
+          >Info</a
+        >
+      </p>
+
+      <input
+        type="text"
+        id="locationInput"
+        placeholder="Enter city, zip, etc."
+      />
+      <button onclick="getWeather()">Get Weather</button>
+      <button onclick="getLocationWeather()">Use My Location</button>
+
+      <div id="weatherResult"></div>
+      <div id="forecastResult"></div>
+    </div>
+
+    <script>
+      async function getWeather() {
+        const location = document.getElementById("locationInput").value;
+        const res = await fetch("/weather", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ location }),
+        });
+
+        const data = await res.json();
+        displayWeather(data);
+      }
+
+      async function getLocationWeather() {
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+          const lat = pos.coords.latitude;
+          const lon = pos.coords.longitude;
+          const res = await fetch("/weather", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ lat, lon }),
+          });
+
+          const data = await res.json();
+          displayWeather(data);
+        });
+      }
+
+      function displayWeather(data) {
+        if (data.error || !data.current || !data.forecast) {
+          document.getElementById("weatherResult").innerHTML =
+            "<p style='color:red;'>❌ Unable to retrieve weather data. Please try a valid location.</p>";
+          return;
+        }
+
+        const w = data.current;
+        const f = data.forecast;
+
+        if (!w.weather || w.weather.length === 0) {
+          document.getElementById("weatherResult").innerHTML =
+            "<p style='color:red;'>❌ Weather data is missing or incorrect.</p>";
+          return;
+        }
+
+        document.getElementById("weatherResult").innerHTML = `
+          <h2>${w.name}</h2>
+          <p><img src="http://openweathermap.org/img/wn/${w.weather[0].icon}.png"> ${w.weather[0].description}</p>
+          <p>🌡️ Temp: ${w.main.temp}°C</p>
+          <p>💧 Humidity: ${w.main.humidity}%</p>
+          <p>🌬️ Wind: ${w.wind.speed} m/s</p>
+        `;
+
+        const forecastHTML = f.list
+          .filter((_, i) => i % 8 === 0)
+          .map((day) => {
+            const icon = day.weather?.[0]?.icon ?? "01d";
+            return `
+            <div class="forecast-card">
+              <p>${new Date(day.dt_txt).toDateString()}</p>
+              <img src="http://openweathermap.org/img/wn/${icon}.png" />
+              <p>${day.main.temp}°C</p>
+            </div>
+          `;
+          })
+          .join("");
+
+        document.getElementById(
+          "forecastResult"
+        ).innerHTML = `<h3>5-Day Forecast</h3><div class="forecast">${forecastHTML}</div>`;
+      }
+    </script>
+  </body>
+</html>
